@@ -16,10 +16,8 @@ public class addFog : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetAxis("Fire3") != 0) {
-            if (Input.GetAxisRaw("Fire3") != 0) {
-                changeShader();
-            }
+        if (Input.GetAxisRaw("Fire3") != 0) {
+            changeShader();
         }
     }
 
