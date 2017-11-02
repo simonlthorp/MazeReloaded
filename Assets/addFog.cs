@@ -59,6 +59,6 @@ public class addFog : MonoBehaviour {
                 rend.material.shader = shader3;
             }
         }
-        foggy = !foggy;
+        isDay = !isDay;
     }
 }
