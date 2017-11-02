@@ -6,12 +6,12 @@ public class characterController : MonoBehaviour {
     public float speed = 10.0f;
     public GameObject maze;
     private CapsuleCollider col;
-    public MeshCollider[] cols;
+    public BoxCollider[] cols;
     Vector3 startPos;
 	// Use this for initialization
 	void Start () {
         col = GetComponent<CapsuleCollider>();
-        cols = maze.GetComponentsInChildren<MeshCollider>();
+        cols = maze.GetComponentsInChildren<BoxCollider>();
         Cursor.lockState = CursorLockMode.Locked;
         startPos = transform.position;
 	}
@@ -30,16 +30,12 @@ public class characterController : MonoBehaviour {
             walkThroughWalls();
         }
 
-        if (Input.GetAxis("Fire2") != 0) {
-            if (Input.GetAxisRaw("Fire2") != 0) {
-                transform.position = startPos;
-            }
+        if (Input.GetAxisRaw("Fire2") != 0) {
+            transform.position = startPos;
         }
 
-        if (Input.GetAxis("Cancel") != 0) {
-            if (Input.GetAxisRaw("Cancel") != 0) {
+        if (Input.GetAxisRaw("Cancel") != 0) {
                 Application.Quit();
-            }
         }
 
         if (Input.GetKeyDown("`")) {
@@ -48,12 +44,8 @@ public class characterController : MonoBehaviour {
 	}
 
     void walkThroughWalls() {
-        int count = 1;
-        foreach(MeshCollider meshCol in cols) {
-            if (count != 1) {
-                meshCol.enabled = !meshCol.enabled;
-            }
-            count++;
+        foreach(BoxCollider boxhCol in cols) {
+            boxhCol.enabled = !boxhCol.enabled;
         }
     }
 }
