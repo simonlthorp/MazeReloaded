@@ -1,52 +1,113 @@
-﻿Shader "Custom/DayNight" {
-	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
-		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_Glossiness ("Smoothness", Range(0,1)) = 0.5
-		_Metallic ("Metallic", Range(0,1)) = 0.0
-		_Night ("Night", float4) = (0,0,0,0);
-	}
-	SubShader {
-		Tags { "RenderType"="Opaque" }
-		LOD 200
-		
-		CGPROGRAM
-		// Physically based Standard lighting model, and enable shadows on all light types
-		#pragma surface surf Standard fullforwardshadows
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-		// Use shader model 3.0 target, to get nicer looking lighting
-		#pragma target 3.0
+Shader "Custom/DayNight" {
+    SubShader
+    {
+        Pass
+        {
+            Tags{ "LightMode" = "ForwardBase" }
+ 
+            CGPROGRAM
+            #include "UnityCG.cginc"
+ 
+            #pragma target 2.0
+            #pragma vertex vertexShader
+            #pragma fragment fragmentShader
+ 
+            float4 _LightColor0;
+ 
+            struct vsIn {
+                float4 position : POSITION;
+                float3 normal : NORMAL;
+            };
+ 
+            struct vsOut {
+                float4 position : SV_POSITION;
+                float3 normal : NORMAL;
+            };
+ 
+            vsOut vertexShader(vsIn v)
+            {
+                vsOut o;
+                o.position = UnityObjectToClipPos(v.position);
+                o.normal = normalize(mul(float4(v.normal, 0.0), unity_WorldToObject).xyz);
+ 
+                return o;
+            }
+ 
+            float4 fragmentShader(vsOut psIn) : SV_Target
+            {
+                float4 AmbientLight = UNITY_LIGHTMODEL_AMBIENT;
+ 
+                float4 LightDirection = normalize(_WorldSpaceLightPos0);
+ 
+                float4 diffuseTerm = saturate(dot(LightDirection, psIn.normal));
+                float4 DiffuseLight = diffuseTerm * _LightColor0;
+ 
+                return AmbientLight + DiffuseLight;
+            }
+ 
+            ENDCG
+        }
+    }
 
-		sampler2D _MainTex;
+/*
+    Properties
+    {
+        [NoScaleOffset] _MainTex ("Texture", 2D) = "white" {}
+    }
+    SubShader
+    {
+        Pass
+        {
+            Tags {"LightMode"="ForwardBase"}
+        
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+            #include "UnityLightingCommon.cginc"
 
-		struct Input {
-			float2 uv_MainTex;
-		};
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                fixed4 diff : COLOR0;
+                float4 vertex : SV_POSITION;
+				
+            };
 
-		half _Glossiness;
-		half _Metallic;
-		fixed4 _Color;
-		float4 _Night
+            v2f vert (appdata_base v)
+            {
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = v.texcoord;
+                half3 worldNormal = UnityObjectToWorldNormal(v.normal);
+                half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
+                o.diff = nl * _LightColor0;
 
-		
+                // the only difference from previous shader:
+                // in addition to the diffuse lighting from the main light,
+                // add illumination from ambient or light probes
+                // ShadeSH9 function from UnityCG.cginc evaluates it,
+                // using world space normal
+                o.diff.rgb += ShadeSH9(half4(worldNormal,1));
+				
+                return o;
 
-		// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-		// #pragma instancing_options assumeuniformscaling
-		UNITY_INSTANCING_CBUFFER_START(Props)
-			// put more per-instance properties here
-		UNITY_INSTANCING_CBUFFER_END
+            }
+            
+            sampler2D _MainTex;
 
-		void surf (Input IN, inout SurfaceOutputStandard o) {
-			// Albedo comes from a texture tinted by color
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			o.Albedo = c.rgb;
-			// Metallic and smoothness come from slider variables
-			o.Metallic = _Metallic;
-			o.Smoothness = _Glossiness;
-			o.Alpha = c.a;
-		}
-		ENDCG
-	}
-	FallBack "Diffuse"
+            fixed4 frag (v2f i) : SV_Target
+            {
+                fixed4 col = tex2D(_MainTex, i.uv);
+				fixed4 c;
+                col *= i.diff;
+				c.rgb = UNITY_LIGHTMODEL_AMBIENT.rgb * 2 * col.rgb;
+                return col;
+            }
+            ENDCG
+        }
+    }
+	*/
 }

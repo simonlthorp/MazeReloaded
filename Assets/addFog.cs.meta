@@ -1,10 +1,16 @@
 fileFormatVersion: 2
 guid: 5d650bc4cc411ae4d8f8346a77523cf8
-timeCreated: 1509339096
+timeCreated: 1509595763
 licenseType: Free
 MonoImporter:
+  externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - shader1: {instanceID: 0}
+  - shader2: {fileID: 4800000, guid: fcdfef8067968aa4a91a9f9ba7b420e2, type: 3}
+  - shader3: {fileID: 4800000, guid: ad042bebe049e2d41ac11b4a5363f4cd, type: 3}
+  - maze: {instanceID: 0}
+  - rend2: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

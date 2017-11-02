@@ -5,10 +5,12 @@ using UnityEngine;
 public class addFog : MonoBehaviour {
     public Shader shader1;
     public Shader shader2;
+    public Shader shader3;
     public GameObject maze;
     public Renderer[] rend1;
     public Renderer rend2;
     bool foggy = false;
+    bool isDay = true;
 	// Use this for initialization
 	void Start () {
 		rend1= maze.GetComponentsInChildren<Renderer>();
@@ -19,6 +21,12 @@ public class addFog : MonoBehaviour {
         if (Input.GetAxisRaw("Fire3") != 0) {
             changeShader();
         }
+
+        if(Input.GetAxisRaw("Fire4") != 0)
+        {
+            ToggleDay();
+        }
+
     }
 
     void changeShader() {
@@ -30,6 +38,25 @@ public class addFog : MonoBehaviour {
         else {
             foreach (Renderer rend in rend1) {
                 rend.material.shader = shader2;
+            }
+        }
+        foggy = !foggy;
+    }
+
+    private void ToggleDay()
+    {
+        if (isDay)
+        {
+            foreach (Renderer rend in rend1)
+            {
+                rend.material.shader = shader1;
+            }
+        }
+        else
+        {
+            foreach (Renderer rend in rend1)
+            {
+                rend.material.shader = shader3;
             }
         }
         foggy = !foggy;
